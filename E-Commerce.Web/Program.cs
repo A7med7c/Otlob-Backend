@@ -1,4 +1,9 @@
 
+using DomainLayer.Contracts;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+using Persistence.Data;
+
 namespace E_Commerce.Web
 {
     public class Program
@@ -13,9 +18,24 @@ namespace E_Commerce.Web
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
 
+            //Get Connection string
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            // rgister Seeder Service
+            builder.Services.AddScoped<IDataSeeder, DataSeeder>();
             #endregion
 
             var app = builder.Build();
+
+            #region Data Seeder Must be Before pipeline
+            // create new scope 
+            using var Scoope = app.Services.CreateScope();
+            // create object from this scoope based on the regesterd in the DI Container
+            var seedingScopeObject = Scoope.ServiceProvider.GetRequiredService<IDataSeeder>();
+            seedingScopeObject.SeedData();
+            #endregion
 
             #region Configure the HTTP request pipeline.
 
