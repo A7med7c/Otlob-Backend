@@ -5,6 +5,7 @@ using Persistence;
 using Persistence.Data;
 using Persistence.Repositories;
 using ServiceImplementation;
+using ServiceImplementation.MappingProfiles;
 using SeviceAbstraction;
 
 namespace E_Commerce.Web
@@ -31,6 +32,7 @@ namespace E_Commerce.Web
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IServicesManager, ServicesManager>();
 
+            builder.Services.AddScoped<ImageResolver>();
             builder.Services.AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(typeof(ServiceImplementation.AssemblyReference).Assembly);
@@ -41,11 +43,13 @@ namespace E_Commerce.Web
 
             #region Data Seeder Must be Before pipeline
             // create new scope 
-            using var Scoope = app.Services.CreateScope();
-            // create object from this scoope based on the regesterd in the DI Container
-            var seedingScopeObject = Scoope.ServiceProvider.GetRequiredService<IDataSeeder>();
-            // dosent return anything so sync vs async dosent change things exept making program working async
-            await seedingScopeObject.SeedDataAsync();
+            using (var scope = app.Services.CreateScope())
+            {
+                // create object from this scoope based on the regesterd in the DI Container
+                var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
+                // dosent return anything so sync vs async dosent change things exept making program working async
+                await seeder.SeedDataAsync();
+            }
             #endregion
 
             #region Configure the HTTP request pipeline.
