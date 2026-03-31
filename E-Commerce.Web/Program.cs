@@ -8,7 +8,7 @@ namespace E_Commerce.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +34,8 @@ namespace E_Commerce.Web
             using var Scoope = app.Services.CreateScope();
             // create object from this scoope based on the regesterd in the DI Container
             var seedingScopeObject = Scoope.ServiceProvider.GetRequiredService<IDataSeeder>();
-            seedingScopeObject.SeedData();
+            // dosent return anything so sync vs async dosent change things exept making program working async
+            await seedingScopeObject.SeedDataAsync();
             #endregion
 
             #region Configure the HTTP request pipeline.
