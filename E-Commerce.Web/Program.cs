@@ -3,6 +3,9 @@ using DomainLayer.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
+using Persistence.Repositories;
+using ServiceImplementation;
+using SeviceAbstraction;
 
 namespace E_Commerce.Web
 {
@@ -25,6 +28,13 @@ namespace E_Commerce.Web
             });
             // rgister Seeder Service
             builder.Services.AddScoped<IDataSeeder, DataSeeder>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IServicesManager, ServicesManager>();
+
+            builder.Services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(typeof(ServiceImplementation.AssemblyReference).Assembly);
+            });
             #endregion
 
             var app = builder.Build();
@@ -45,7 +55,7 @@ namespace E_Commerce.Web
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
 
             app.MapControllers();
