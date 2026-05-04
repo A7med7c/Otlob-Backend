@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
-using DomainLayer.Models;
+using DomainLayer.Models.Product;
 using SeviceAbstraction;
 using Shared.DTOs;
 
