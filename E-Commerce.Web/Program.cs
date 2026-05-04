@@ -1,8 +1,11 @@
 
 using DomainLayer.Contracts;
+using DomainLayer.Models.IdetityModule;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Data;
+using Persistence.Identity;
 using Persistence.Repositories;
 using ServiceImplementation;
 using ServiceImplementation.MappingProfiles;
@@ -27,6 +30,11 @@ namespace E_Commerce.Web
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
             // rgister Seeder Service
             builder.Services.AddScoped<IDataSeeder, DataSeeder>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -37,6 +45,9 @@ namespace E_Commerce.Web
             {
                 cfg.AddMaps(typeof(ServiceImplementation.AssemblyReference).Assembly);
             });
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
             #endregion
 
             var app = builder.Build();
@@ -48,6 +59,7 @@ namespace E_Commerce.Web
                 // create object from this scoope based on the regesterd in the DI Container
                 var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
                 // dosent return anything so sync vs async dosent change things exept making program working async
+                await seeder.SeedIdentityDataAsync();
                 await seeder.SeedDataAsync();
             }
             #endregion

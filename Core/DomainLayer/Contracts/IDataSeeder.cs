@@ -3,4 +3,5 @@
 public interface IDataSeeder
 {
     Task SeedDataAsync();
+    Task SeedIdentityDataAsync();
 }
