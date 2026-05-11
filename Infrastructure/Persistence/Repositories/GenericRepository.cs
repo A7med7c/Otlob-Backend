@@ -15,4 +15,16 @@ public class GenericRepository<TEntity, TKey>(ApplicationDbContext _dbContext) :
     public async Task AddAsync(TEntity entity) => await _dbSet.AddAsync(entity);
     public void Update(TEntity entity) => _dbSet.Update(entity);
     public void Remove(TEntity entity) => _dbSet.Remove(entity);
+
+    #region Specifications
+    public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, TKey> specifications)
+    => await SpecificationsEvaluator.CreateQuery(_dbSet, specifications).ToListAsync();
+
+    public async Task<TEntity?> GetByIdAsync(ISpecifications<TEntity, TKey> specifications)
+    => await SpecificationsEvaluator.CreateQuery(_dbSet, specifications).FirstOrDefaultAsync();
+
+    public async Task<int> CountAsync(ISpecifications<TEntity, TKey> specifications)
+    => await SpecificationsEvaluator.CreateQuery(_dbSet, specifications).CountAsync();
+
+    #endregion
 }
