@@ -1,7 +1,7 @@
 ﻿using DomainLayer.Models.IdetityModule;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace Persistence.Identity;
 

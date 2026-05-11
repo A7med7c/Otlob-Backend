@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
+using DomainLayer.Exceptions;
 using DomainLayer.Models.Product;
 using ServiceImplementation.Specifications;
 using SeviceAbstraction;
 using Shared;
-using Shared.DTOs;
+using Shared.DTOs.Product;
 
 namespace ServiceImplementation;
 
@@ -24,10 +25,13 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
         var TotalRecords = await repo.CountAsync(totalspecs);
         return new PaginatedResult<ProductDto>(queryParams.PageIndex, ProductsCount, TotalRecords, Data);
     }
-    public async Task<ProductDto?> GetProductByIdAsync(int id)
+
+    public async Task<ProductDto> GetProductByIdAsync(int id)
     {
         var specs = new ProductWithTypesandBrandsSpecifications(id);
-        var product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(specs);
+        var product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(specs)
+                                ?? throw new ProductNotFoundException(id);
+
         var productDto = _mapper.Map<Product, ProductDto>(product);
         return productDto;
 
