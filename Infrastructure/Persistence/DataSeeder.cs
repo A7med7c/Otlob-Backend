@@ -27,7 +27,6 @@ public class DataSeeder(ApplicationDbContext _dbContext,
             if (pendingMigrations.Any())
                 await _dbContext.Database.MigrateAsync();
 
-            // ✅ Check if brands exist WITH correct IDs, not just "any rows"
             var brandsSeededCorrectly = await _dbContext.ProductBrands
                 .AnyAsync(b => b.Id == 1);
 
@@ -119,7 +118,6 @@ public class DataSeeder(ApplicationDbContext _dbContext,
 
             await _identityContext.SaveChangesAsync();
         }
-        // ✅ Ignore unused Identity tables
         catch (Exception ex)
         {
         }
