@@ -1,6 +1,7 @@
 
 using DomainLayer.Contracts;
 using DomainLayer.Models.IdetityModule;
+using E_Commerce.Web.CustomMiddleWares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -66,6 +67,9 @@ namespace E_Commerce.Web
 
             #region Configure the HTTP request pipeline.
 
+            #region Custom MiddleWares
+            app.UseMiddleware<CustomExceptionHandlerMiddleware>();
+            #endregion
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
