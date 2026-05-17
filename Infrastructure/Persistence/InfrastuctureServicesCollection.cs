@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DomainLayer.Models.IdetityModule;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 namespace Persistence;
@@ -17,6 +19,7 @@ public static class InfrastructureServiceExtensions
         {
             options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
         });
+
         // rgister Seeder Service
         services.AddScoped<IDataSeeder, DataSeeder>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -26,6 +29,14 @@ public static class InfrastructureServiceExtensions
         {
             return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection"));
         });
+
+
+        services.AddIdentityCore<ApplicationUser>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+        })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
         return services;
     }
 }
