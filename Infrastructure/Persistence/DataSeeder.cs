@@ -1,10 +1,6 @@
-﻿using DomainLayer.Contracts;
-using DomainLayer.Models.IdetityModule;
+﻿using DomainLayer.Models.IdetityModule;
 using DomainLayer.Models.Product;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Persistence.Data;
-using Persistence.Identity;
 using System.Text.Json;
 
 namespace Persistence;
@@ -112,8 +108,12 @@ public class DataSeeder(ApplicationDbContext _dbContext,
                     UserName = "AbdoRagab",
                     PhoneNumber = "0123456789"
                 };
+
                 await _userManager.CreateAsync(userOne, "A7med_123");
                 await _userManager.CreateAsync(userTwo, "A7med_123");
+
+                await _userManager.AddToRoleAsync(userTwo, "SuperAdmin");
+                await _userManager.AddToRoleAsync(userOne, "Admin");
             }
 
             await _identityContext.SaveChangesAsync();

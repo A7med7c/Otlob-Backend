@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SeviceAbstraction;
 using Shared;
 using Shared.DTOs.Product;
@@ -17,6 +18,7 @@ public class ProductsController(IServicesManager _servicesManager) : ControllerB
     }
 
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         var product = await _servicesManager.ProductService.GetProductByIdAsync(id);
