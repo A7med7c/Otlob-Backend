@@ -1,4 +1,5 @@
 ﻿using DomainLayer.Models.IdetityModule;
+using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
@@ -71,6 +72,16 @@ public class DataSeeder(ApplicationDbContext _dbContext,
                 if (products is not null && products.Any())
                 {
                     await _dbContext.Products.AddRangeAsync(products);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            if (!await _dbContext.Set<DeliveryMethod>().AnyAsync())
+            {
+                var data = File.OpenRead(@"..\Infrastructure\Persistence\Data\SeedingData\DeliveryMethods.json");
+                var deliveryMethods = await JsonSerializer.DeserializeAsync<List<DeliveryMethod>>(data, _jsonOptions);
+                if (deliveryMethods is not null && deliveryMethods.Any())
+                {
+                    await _dbContext.Set<DeliveryMethod>().AddRangeAsync(deliveryMethods);
                     await _dbContext.SaveChangesAsync();
                 }
             }

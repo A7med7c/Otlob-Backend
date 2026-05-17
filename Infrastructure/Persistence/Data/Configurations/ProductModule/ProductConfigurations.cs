@@ -1,8 +1,7 @@
 ﻿using DomainLayer.Models.Product;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.Data.Configurations;
+namespace Persistence.Data.Configurations.ProductModule;
 
 internal class ProductConfigurations : IEntityTypeConfiguration<Product>
 {
