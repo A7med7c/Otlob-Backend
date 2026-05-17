@@ -16,7 +16,7 @@ public class BasketsController(IServicesManager servicesManager) : ControllerBas
     }
 
     [HttpPost]
-    public async Task<ActionResult<CustomerBasketDto>> GetBasket(CustomerBasketDto dto)
+    public async Task<ActionResult<CustomerBasketDto>> CreateOrUpdateBasket(CustomerBasketDto dto)
     {
         var basket = await servicesManager.BasketService.CreateorUpdateBasketAsync(dto);
         return Ok(basket);

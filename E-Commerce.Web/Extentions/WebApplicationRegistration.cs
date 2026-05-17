@@ -10,8 +10,8 @@ public static class WebApplicationRegistration
         using (var scope = app.Services.CreateScope())
         {
             var seeder = scope.ServiceProvider.GetRequiredService<IDataSeeder>();
-            await seeder.SeedIdentityDataAsync();
             await seeder.SeedDataAsync();
+            await seeder.SeedIdentityDataAsync();
         }
     }
     public static IApplicationBuilder UseCustomExceptionMiddlewares(this IApplicationBuilder app)

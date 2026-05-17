@@ -25,21 +25,28 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate Next, ILogger<Cust
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
-        context.Response.StatusCode = ex switch
+        var cutomResponse = new CustomError()
+        {
+            Message = ex.Message
+        };
+
+        var statusCode = ex switch
         {
             NotFoundException => StatusCodes.Status404NotFound,
+            UnAuthorizedException => StatusCodes.Status401Unauthorized,
+            BadRequestException badrequestException => GetBadRequestException(badrequestException, cutomResponse),
             _ => StatusCodes.Status500InternalServerError
         };
 
-        context.Response.ContentType = "application/json";
-
-        var cutomResponse = new CustomError()
-        {
-            StatusCode = context.Response.StatusCode,
-            Message = ex.Message,
-        };
+        context.Response.StatusCode = statusCode;
+        cutomResponse.StatusCode = statusCode;
 
         await context.Response.WriteAsJsonAsync(cutomResponse);
+    }
+    private static int GetBadRequestException(BadRequestException badrequestException, CustomError cutomResponse)
+    {
+        cutomResponse.Errors = badrequestException.Errors;
+        return StatusCodes.Status400BadRequest;
     }
 
     private static async Task HandleNotFoundEndPointAsync(HttpContext context)
