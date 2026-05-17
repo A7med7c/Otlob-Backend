@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DomainLayer.Models;
 using DomainLayer.Models.BasketModule;
-using Shared.DTOs;
 using Shared.DTOs.Basket;
 
 namespace ServiceImplementation.MappingProfiles;

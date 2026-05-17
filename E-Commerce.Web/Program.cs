@@ -1,8 +1,5 @@
-using DomainLayer.Models.IdetityModule;
 using E_Commerce.Web.Extentions;
-using Microsoft.AspNetCore.Identity;
 using Persistence;
-using Persistence.Identity;
 using ServiceImplementation;
 
 namespace E_Commerce.Web
@@ -16,13 +13,11 @@ namespace E_Commerce.Web
             #region Add services to the container
 
             builder.Services.AddControllers();
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
-
             builder.Services.AddSwaggerServices();
             builder.Services.AddWebApplicationServices();
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastuctureServices(builder.Configuration);
+            builder.Services.AddJWTServices(builder.Configuration);
             #endregion
 
             var app = builder.Build();
@@ -37,9 +32,11 @@ namespace E_Commerce.Web
             {
                 app.UseSwaggerMiddlewares();
             }
-            app.UseStaticFiles();
             app.UseHttpsRedirection();
-
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapControllers();
             #endregion
 
