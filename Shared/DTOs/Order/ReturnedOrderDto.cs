@@ -2,7 +2,7 @@
 
 namespace Shared.DTOs.Order;
 
-public class CreatedOrderDto
+public class ReturnedOrderDto
 {
     public Guid Id { get; set; }
     public string UserEmail { get; set; } = default!;
