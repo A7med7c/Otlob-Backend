@@ -11,13 +11,14 @@ namespace ServiceImplementation.MappingProfiles
         {
             CreateMap<AddressDto, ShippingAddress>().ReverseMap();
 
-            CreateMap<Order, CreatedOrderDto>()
+            CreateMap<Order, ReturnedOrderDto>()
                 .ForMember(d => d.DeliveyMethod, o => o.MapFrom(s => s.DeliveyMethod.ShortName));
 
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(d => d.ProductName, o => o.MapFrom(s => s.Product.ProductName))
                 .ForMember(d => d.PictureUrl, o => o.MapFrom<OrderItemPictureUrlResolver>());
 
+            CreateMap<DeliveryMethod, DeliveryMethodDto>().ReverseMap();
         }
     }
 }

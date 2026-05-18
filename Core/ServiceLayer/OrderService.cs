@@ -12,7 +12,7 @@ namespace ServiceImplementation
 {
     public class OrderService(IMapper mapper, IBasketRepository basketRepository, IUnitOfWork unitOfWork) : IOrderService
     {
-        public async Task<CreatedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
+        public async Task<ReturnedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
         {
             var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.Address);
 
@@ -42,7 +42,18 @@ namespace ServiceImplementation
             await unitOfWork.GetRepository<Order, Guid>().AddAsync(createdOrder);
             await unitOfWork.SaveChangesAsync();
 
-            return mapper.Map<Order, CreatedOrderDto>(createdOrder);
+            return mapper.Map<Order, ReturnedOrderDto>(createdOrder);
+        }
+
+        public async Task<List<DeliveryMethodDto>> GetDeliveryMethodsAsync()
+        {
+            var deliverymethods = await unitOfWork.GetRepository<DeliveryMethod, int>().GetAllAsync();
+            List<DeliveryMethodDto> deliveryMethodDtos = [];
+            foreach (var method in deliverymethods)
+            {
+                deliveryMethodDtos.Add(mapper.Map<DeliveryMethod, DeliveryMethodDto>(method));
+            }
+            return deliveryMethodDtos;
         }
         private static OrderItem CreateOrderItem(BasketItem item, Product product)
         {
