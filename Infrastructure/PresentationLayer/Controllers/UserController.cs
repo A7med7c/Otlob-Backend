@@ -6,9 +6,7 @@ using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
-    [ApiController]
-    [Route("api/[Controller]")]
-    public class UserController(IServicesManager servicesManager) : ControllerBase
+    public class UserController(IServicesManager servicesManager) : ApiBaseController
     {
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
@@ -35,7 +33,7 @@ namespace PresentationLayer.Controllers
         [HttpGet]
         public async Task<ActionResult<UserDto>> GetCurrentUser()
         {
-            var email = User.FindFirstValue(ClaimTypes.Email);
+            var email = GetCurrentUserEmail();
             var user = await servicesManager.AuthenticationService.GetCurrentUserAsync(email!);
             return Ok(user);
         }

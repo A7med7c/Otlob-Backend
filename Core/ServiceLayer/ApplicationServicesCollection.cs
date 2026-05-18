@@ -15,6 +15,7 @@ public static class ApplicationServiceExtensions
             cfg.AddMaps(typeof(ServiceImplementation.AssemblyReference).Assembly);
         });
         services.AddScoped<ImageResolver>();
+        services.AddScoped<OrderItemPictureUrlResolver>();
 
         return services;
     }

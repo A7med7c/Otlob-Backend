@@ -16,9 +16,13 @@ public class ServicesManager(IUnitOfWork _unitOfWork, IMapper _mapper, IBasketRe
         new Lazy<IBasketService>(() => new BasketService(_basketRpository, _mapper));
     private readonly Lazy<IAuthenticationService> _authService =
        new Lazy<IAuthenticationService>(() => new AuthenticationService(_userManager, _configuration, _mapper));
+    private readonly Lazy<IOrderService> _orderService =
+          new Lazy<IOrderService>(() => new OrderService(_mapper, _basketRpository, _unitOfWork));
 
 
     public IProductService ProductService => _productService.Value;
     public IBasketService BasketService => _basketService.Value;
     public IAuthenticationService AuthenticationService => _authService.Value;
+
+    public IOrderService OrderService => _orderService.Value;
 }

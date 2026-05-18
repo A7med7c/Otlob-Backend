@@ -14,7 +14,7 @@ namespace ServiceImplementation
     {
         public async Task<CreatedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
         {
-            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.AddressDto);
+            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.Address);
 
             var basket = await basketRepository.GetBasketById(orderDto.BasketId)
                 ?? throw new BasketNotFoundException(orderDto.BasketId);
@@ -44,7 +44,6 @@ namespace ServiceImplementation
 
             return mapper.Map<Order, CreatedOrderDto>(createdOrder);
         }
-
         private static OrderItem CreateOrderItem(BasketItem item, Product product)
         {
             return new OrderItem()
