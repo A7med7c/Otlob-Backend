@@ -15,8 +15,23 @@ namespace PresentationLayer.Controllers
             return Ok(order);
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ReturnedOrderDto>>> GetUserOrders()
+        {
+            var orders = await servicesManager.OrderService.GetAllOrdersAsync(GetCurrentUserEmail());
+            return Ok(orders);
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<ReturnedOrderDto>> GetOrderById(Guid id)
+        {
+            var order = await servicesManager.OrderService.GetOrderByIdAsync(id);
+            return Ok(order);
+        }
+
         [HttpGet("DeliveryMethods")]
-        public async Task<ActionResult<List<DeliveryMethodDto>>> GetDeliveryMethods()
+        public async Task<ActionResult<IEnumerable<DeliveryMethodDto>>> GetDeliveryMethods()
         {
             var deliveryMethods = await servicesManager.OrderService.GetDeliveryMethodsAsync();
             return Ok(deliveryMethods);
