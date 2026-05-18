@@ -2,6 +2,10 @@
 
 public class Order : BaseEntity<Guid>
 {
+    public Order()
+    {
+
+    }
     public Order(string userEmail, DeliveryMethod deliveyMethod, ShippingAddress shippingAddress, ICollection<OrderItem> items, decimal subTotal)
     {
         UserEmail = userEmail;

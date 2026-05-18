@@ -6,5 +6,5 @@ public class OrderDto
 {
     public int DeliveryMethodId { get; set; }
     public string BasketId { get; set; } = default!;
-    public AddressDto AddressDto { get; set; } = default!;
+    public AddressDto Address { get; set; } = default!;
 }
