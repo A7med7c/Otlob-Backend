@@ -4,6 +4,7 @@ using DomainLayer.Exceptions;
 using DomainLayer.Models;
 using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
+using ServiceImplementation.Specifications.OrderModule;
 using SeviceAbstraction;
 using Shared.DTOs.Identity;
 using Shared.DTOs.Order;
@@ -45,15 +46,10 @@ namespace ServiceImplementation
             return mapper.Map<Order, ReturnedOrderDto>(createdOrder);
         }
 
-        public async Task<List<DeliveryMethodDto>> GetDeliveryMethodsAsync()
+        public async Task<IEnumerable<DeliveryMethodDto>> GetDeliveryMethodsAsync()
         {
             var deliverymethods = await unitOfWork.GetRepository<DeliveryMethod, int>().GetAllAsync();
-            List<DeliveryMethodDto> deliveryMethodDtos = [];
-            foreach (var method in deliverymethods)
-            {
-                deliveryMethodDtos.Add(mapper.Map<DeliveryMethod, DeliveryMethodDto>(method));
-            }
-            return deliveryMethodDtos;
+            return mapper.Map<IEnumerable<DeliveryMethod>, IEnumerable<DeliveryMethodDto>>(deliverymethods);
         }
         private static OrderItem CreateOrderItem(BasketItem item, Product product)
         {
@@ -63,6 +59,21 @@ namespace ServiceImplementation
                 Price = product.Price,
                 Quantity = item.Quantity
             };
+        }
+
+        public async Task<IEnumerable<ReturnedOrderDto>> GetAllOrdersAsync(string email)
+        {
+            var specs = new OrderSpecifications(email);
+            var orders = await unitOfWork.GetRepository<Order, Guid>().GetAllAsync(specs);
+            return mapper.Map<IEnumerable<Order>, IEnumerable<ReturnedOrderDto>>(orders);
+        }
+
+        public async Task<ReturnedOrderDto> GetOrderByIdAsync(Guid Id)
+        {
+            var specs = new OrderSpecifications(Id);
+            var order = await unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(specs)
+                            ?? throw new OrderNotFoundException(Id);
+            return mapper.Map<Order, ReturnedOrderDto>(order);
         }
     }
 }
