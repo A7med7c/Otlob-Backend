@@ -150,9 +150,5 @@ No Dockerfiles or CI/CD workflow files are currently present in the repository. 
 - Add test projects and quality gates
 - Improve validation, observability, and security hardening
 
-## Contributors
-- Ahmed Ragab (120670728+A7med7c@users.noreply.github.com)
-- Ahmed Ragab (ragabali@std.mans.edu.eg)
-
 ## License
 No license file was found in the repository.
