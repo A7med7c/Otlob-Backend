@@ -10,8 +10,34 @@ public static class ServicesExtensions
 {
     public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
     {
-        services.AddOpenApi();
         services.AddSwaggerGen();
+        //options =>
+        //{
+        //    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        //    {
+        //        In = ParameterLocation.Header,
+        //        Name = "Authorization",
+        //        Type = SecuritySchemeType.Http,
+        //        Scheme = "Bearer",
+        //        BearerFormat = "JWT",
+        //        Description = "Enter 'Bearer' followed by a space and your token."
+        //    });
+
+        //    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        //    {
+        //        {
+        //            new OpenApiSecurityScheme
+        //            {
+        //                Reference = new OpenApiReference
+        //                {
+        //                    Id = "Bearer",
+        //                    Type = ReferenceType.SecurityScheme
+        //                }
+        //            },
+        //            Array.Empty<string>()
+        //        }
+        //    });
+        //});
         return services;
     }
     public static IServiceCollection AddWebApplicationServices(this IServiceCollection services)
@@ -40,7 +66,9 @@ public static class ServicesExtensions
                 ValidateAudience = true,
                 ValidAudience = configuration["JWTOptions:Audience"],
                 ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTOptions:Key"]))
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTOptions:Key"]!)),
+                ClockSkew = TimeSpan.Zero
             };
         });
         return services;

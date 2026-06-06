@@ -23,6 +23,8 @@ public static class InfrastructureServiceExtensions
         // rgister Seeder Service
         services.AddScoped<IDataSeeder, DataSeeder>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICashRepository, CashRepository>();
+
 
         services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddSingleton<IConnectionMultiplexer>((_) =>
