@@ -1,6 +1,8 @@
 using E_Commerce.Web.Extentions;
 using Persistence;
 using ServiceImplementation;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace E_Commerce.Web
 {
@@ -20,10 +22,15 @@ namespace E_Commerce.Web
                     builder.AllowAnyOrigin();
                 });
             });
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             builder.Services.AddSwaggerServices();
             builder.Services.AddWebApplicationServices();
-            builder.Services.AddApplicationServices();
+            builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddInfrastuctureServices(builder.Configuration);
             builder.Services.AddJWTServices(builder.Configuration);
             #endregion
@@ -43,7 +50,7 @@ namespace E_Commerce.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors("AllowAll")
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

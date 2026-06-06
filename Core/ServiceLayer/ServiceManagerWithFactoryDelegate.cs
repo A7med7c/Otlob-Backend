@@ -15,4 +15,5 @@ Func<IOrderService> orderFactory, Func<IPaymentService> paymentFactory) : IServi
     public IOrderService OrderService => orderFactory.Invoke();
 
     public IPaymentService PaymentService => paymentFactory.Invoke();
+
 }

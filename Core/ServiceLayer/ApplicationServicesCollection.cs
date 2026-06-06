@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DomainLayer.Models.SettingsModule;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using ServiceImplementation.MappingProfiles;
 using SeviceAbstraction;
 
@@ -6,7 +8,7 @@ namespace ServiceImplementation;
 
 public static class ApplicationServiceExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IServicesManager, ServiceManagerWithFactoryDelegate>();
 
@@ -32,12 +34,19 @@ public static class ApplicationServiceExtensions
 
         services.AddScoped<ICashService, CashService>();
 
+        services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+        services.Configure<TwilioSettings>(configuration.GetSection("TwilioSettings"));
+
+        services.AddTransient<INotificationsService, NotificationsService>();
+
+
         services.AddAutoMapper(cfg =>
         {
             cfg.AddMaps(typeof(ServiceImplementation.AssemblyReference).Assembly);
         });
         services.AddScoped<ImageResolver>();
         services.AddScoped<OrderItemPictureUrlResolver>();
+
 
         return services;
     }
