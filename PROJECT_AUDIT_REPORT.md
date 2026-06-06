@@ -103,7 +103,7 @@ The system is a modular monolith with clear layer boundaries but incomplete oper
 |---|---|---|---|---|
 | Medium | `/tmp/workspace/A7med7c/Otlob-Backend/Core/ServiceLayer/OrderService.cs:27-31` | Potential N+1 query in order creation loop (per basket item product fetch). | Fetch products in bulk by IDs before loop. | Query products once by `Contains` on item IDs. |
 | Medium | `/tmp/workspace/A7med7c/Otlob-Backend/Shared/ProductQueryParams.cs` | Paging defaults can produce invalid/empty paging behavior. | Set default `PageIndex=1`, `PageSize=5`, enforce minimums. | Add guards in property setters. |
-| Low | `/tmp/workspace/A7med7c/Otlob-Backend/Core/ServiceLayer/ProductService.cs:22` | `ProductsCount` computed from mapped in-memory data; can diverge from requested page semantics naming. | Clarify naming (`CurrentPageCount`) and use `products.Count()` before mapping if needed. | Use explicit metadata fields. |
+| Low | `/tmp/workspace/A7med7c/Otlob-Backend/Core/ServiceLayer/ProductService.cs:22` | `ProductsCount` name is ambiguous because it represents current page item count, not total matching records. | Rename it (`CurrentPageCount`) and keep total count sourced from a dedicated count query. | Use explicit pagination metadata fields. |
 
 ## 2.5 API Design Findings
 | Severity | File Location | Description | Recommended Fix | Example Implementation |

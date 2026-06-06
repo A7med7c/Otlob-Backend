@@ -31,7 +31,7 @@ Otlob Backend is a layered ASP.NET Core Web API for e-commerce operations (catal
 - ASP.NET Core Web API
 - Entity Framework Core 10 (SQL Server provider)
 - ASP.NET Core Identity
-- JWT ******
+- JWT bearer authentication
 - AutoMapper
 - StackExchange.Redis
 - Swagger / Swashbuckle
