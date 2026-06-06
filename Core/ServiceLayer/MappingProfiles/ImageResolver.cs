@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DomainLayer.Models.Product;
 using Microsoft.Extensions.Configuration;
-using Shared.DTOs;
+using Shared.DTOs.Product;
 
 namespace ServiceImplementation.MappingProfiles;
 
@@ -15,3 +15,5 @@ public class ImageResolver(IConfiguration _configuration) : IValueResolver<Produ
         return url;
     }
 }
+
+

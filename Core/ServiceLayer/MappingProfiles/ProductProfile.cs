@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DomainLayer.Models.Product;
-using Shared.DTOs;
+using Shared.DTOs.Product;
 
 namespace ServiceImplementation.MappingProfiles;
 

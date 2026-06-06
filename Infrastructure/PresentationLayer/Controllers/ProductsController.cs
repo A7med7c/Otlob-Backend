@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PresentationLayer.Attributes;
 using SeviceAbstraction;
-using Shared.DTOs;
+using Shared;
+using Shared.DTOs.Product;
 
 namespace PresentationLayer.Controllers;
 
@@ -9,13 +12,15 @@ namespace PresentationLayer.Controllers;
 public class ProductsController(IServicesManager _servicesManager) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+    [Cash]
+    public async Task<ActionResult<IEnumerable<PaginatedResult<ProductDto>>>> GetProducts([FromQuery] ProductQueryParams queryParams)
     {
-        var products = await _servicesManager.ProductService.GetAllProductsAsync();
+        var products = await _servicesManager.ProductService.GetAllProductsAsync(queryParams);
         return Ok(products);
     }
 
     [HttpGet("{id:int}")]
+    [Authorize]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         var product = await _servicesManager.ProductService.GetProductByIdAsync(id);

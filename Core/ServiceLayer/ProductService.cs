@@ -1,22 +1,37 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
+using DomainLayer.Exceptions;
 using DomainLayer.Models.Product;
+using ServiceImplementation.Specifications;
 using SeviceAbstraction;
-using Shared.DTOs;
+using Shared;
+using Shared.DTOs.Product;
 
 namespace ServiceImplementation;
 
 public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProductService
 {
-    public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
+    public async Task<PaginatedResult<ProductDto>> GetAllProductsAsync(ProductQueryParams queryParams)
     {
-        var products = await _unitOfWork.GetRepository<Product, int>().GetAllAsync();
-        var productsDto = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
-        return productsDto;
+        var repo = _unitOfWork.GetRepository<Product, int>();
+
+        var specs = new ProductWithTypesandBrandsSpecifications(queryParams);
+        var products = await repo.GetAllAsync(specs);
+
+        var Data = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
+        var ProductsCount = Data.Count();
+
+        var totalspecs = new TotalRecordsSpecifications(queryParams);
+        var TotalRecords = await repo.CountAsync(totalspecs);
+        return new PaginatedResult<ProductDto>(queryParams.PageIndex, ProductsCount, TotalRecords, Data);
     }
-    public async Task<ProductDto?> GetProductByIdAsync(int id)
+
+    public async Task<ProductDto> GetProductByIdAsync(int id)
     {
-        var product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(id);
+        var specs = new ProductWithTypesandBrandsSpecifications(id);
+        var product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(specs)
+                                ?? throw new ProductNotFoundException(id);
+
         var productDto = _mapper.Map<Product, ProductDto>(product);
         return productDto;
 

@@ -1,10 +1,7 @@
-﻿using DomainLayer.Contracts;
-using DomainLayer.Models.IdetityModule;
+﻿using DomainLayer.Models.IdetityModule;
+using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Persistence.Data;
-using Persistence.Identity;
 using System.Text.Json;
 
 namespace Persistence;
@@ -27,7 +24,6 @@ public class DataSeeder(ApplicationDbContext _dbContext,
             if (pendingMigrations.Any())
                 await _dbContext.Database.MigrateAsync();
 
-            // ✅ Check if brands exist WITH correct IDs, not just "any rows"
             var brandsSeededCorrectly = await _dbContext.ProductBrands
                 .AnyAsync(b => b.Id == 1);
 
@@ -79,6 +75,16 @@ public class DataSeeder(ApplicationDbContext _dbContext,
                     await _dbContext.SaveChangesAsync();
                 }
             }
+            if (!await _dbContext.Set<DeliveryMethod>().AnyAsync())
+            {
+                var data = File.OpenRead(@"..\Infrastructure\Persistence\Data\SeedingData\DeliveryMethods.json");
+                var deliveryMethods = await JsonSerializer.DeserializeAsync<List<DeliveryMethod>>(data, _jsonOptions);
+                if (deliveryMethods is not null && deliveryMethods.Any())
+                {
+                    await _dbContext.Set<DeliveryMethod>().AddRangeAsync(deliveryMethods);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -113,13 +119,16 @@ public class DataSeeder(ApplicationDbContext _dbContext,
                     UserName = "AbdoRagab",
                     PhoneNumber = "0123456789"
                 };
+
                 await _userManager.CreateAsync(userOne, "A7med_123");
                 await _userManager.CreateAsync(userTwo, "A7med_123");
+
+                await _userManager.AddToRoleAsync(userTwo, "SuperAdmin");
+                await _userManager.AddToRoleAsync(userOne, "Admin");
             }
 
             await _identityContext.SaveChangesAsync();
         }
-        // ✅ Ignore unused Identity tables
         catch (Exception ex)
         {
         }
