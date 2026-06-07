@@ -6,6 +6,7 @@ using Shared.DTOs.Order;
 namespace PresentationLayer.Controllers
 {
     [Authorize]
+    [Route("api/orders")]
     public class OrdersController(IServicesManager servicesManager) : ApiBaseController
     {
         [HttpPost]
@@ -30,7 +31,7 @@ namespace PresentationLayer.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("DeliveryMethods")]
+        [HttpGet("deliveryMethods")]
         public async Task<ActionResult<IEnumerable<DeliveryMethodDto>>> GetDeliveryMethods()
         {
             var deliveryMethods = await servicesManager.OrderService.GetDeliveryMethodsAsync();

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
 using DomainLayer.Exceptions;
-using DomainLayer.Models;
+using DomainLayer.Models.BasketModule;
 using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
 using ServiceImplementation.Specifications.OrderModule;
@@ -15,7 +15,9 @@ namespace ServiceImplementation
     {
         public async Task<ReturnedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
         {
-            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.Address);
+            var shipToAddress = orderDto.ShipToAddress ?? orderDto.Address
+                ?? throw new BadRequestException(["Shipping address is required."]);
+            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(shipToAddress);
 
             var basket = await basketRepository.GetBasketById(orderDto.BasketId)
                 ?? throw new BasketNotFoundException(orderDto.BasketId);

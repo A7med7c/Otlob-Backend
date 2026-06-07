@@ -57,4 +57,16 @@ public class PaymentService(IConfiguration configuration, IBasketRepository bask
         await basketRepository.CreateBasketorUpdateAsync(basket);
         return mapper.Map<CustomerBasketDto>(basket);
     }
+
+    public async Task UpdateOrderPaymentStatusAsync(string paymentIntentId, bool isPaymentSucceeded)
+    {
+        var orderRepo = unitOfWork.GetRepository<DomainLayer.Models.OrderModule.Order, Guid>();
+        var order = await orderRepo.GetByIdAsync(new ServiceImplementation.Specifications.OrderModule.OrderWithPaymentIntentIdSpecifications(paymentIntentId));
+        if (order is null)
+            return;
+
+        order.OrderStatus = isPaymentSucceeded ? OrderStatus.PaymentSucceded : OrderStatus.PaymentFailed;
+        orderRepo.Update(order);
+        await unitOfWork.SaveChangesAsync();
+    }
 }

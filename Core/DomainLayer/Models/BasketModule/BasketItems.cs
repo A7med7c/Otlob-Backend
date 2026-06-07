@@ -1,4 +1,4 @@
-﻿namespace DomainLayer.Models
+﻿namespace DomainLayer.Models.BasketModule
 {
     public class BasketItem
     {
@@ -7,6 +7,10 @@
         public string ProductName { get; set; } = default!;
 
         public string PictureUrl { get; set; } = default!;
+
+        public string Brand { get; set; } = default!;
+
+        public string Type { get; set; } = default!;
 
         public decimal Price { get; set; }
 

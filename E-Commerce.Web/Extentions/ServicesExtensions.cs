@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Shared.CutomResponses;
 using System.Text;
+using System.Text.Json;
 
 namespace E_Commerce.Web.Extentions;
 
@@ -69,6 +71,25 @@ public static class ServicesExtensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTOptions:Key"]!)),
                 ClockSkew = TimeSpan.Zero
+            };
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = async context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+
+                    var response = new CustomError
+                    {
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Message = "Unauthorized"
+                    };
+
+                    await context.Response.WriteAsJsonAsync(
+                        response,
+                        new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                }
             };
         });
         return services;

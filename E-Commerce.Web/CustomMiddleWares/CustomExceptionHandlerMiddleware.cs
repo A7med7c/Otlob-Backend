@@ -1,5 +1,6 @@
-﻿using DomainLayer.Exceptions;
+using DomainLayer.Exceptions;
 using Shared.CutomResponses;
+using System.Text.Json;
 
 namespace E_Commerce.Web.CustomMiddleWares;
 
@@ -7,6 +8,7 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate Next, ILogger<Cust
 {
     private readonly RequestDelegate next = Next;
     private readonly ILogger<CustomExceptionHandlerMiddleware> logger = Logger;
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -18,14 +20,13 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate Next, ILogger<Cust
         catch (Exception ex)
         {
             logger.LogError(ex, "Something Went Wrong");
-
             await HandleExceptionAsync(context, ex);
         }
     }
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
-        var cutomResponse = new CustomError()
+        var customResponse = new CustomError()
         {
             Message = ex.Message
         };
@@ -34,24 +35,24 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate Next, ILogger<Cust
         {
             NotFoundException => StatusCodes.Status404NotFound,
             UnAuthorizedException => StatusCodes.Status401Unauthorized,
-            BadRequestException badrequestException => GetBadRequestException(badrequestException, cutomResponse),
+            BadRequestException badrequestException => GetBadRequestException(badrequestException, customResponse),
             _ => StatusCodes.Status500InternalServerError
         };
 
         context.Response.StatusCode = statusCode;
-        cutomResponse.StatusCode = statusCode;
+        customResponse.StatusCode = statusCode;
 
-        await context.Response.WriteAsJsonAsync(cutomResponse);
+        await context.Response.WriteAsJsonAsync(customResponse, JsonOptions);
     }
-    private static int GetBadRequestException(BadRequestException badrequestException, CustomError cutomResponse)
+
+    private static int GetBadRequestException(BadRequestException badrequestException, CustomError customResponse)
     {
-        cutomResponse.Errors = badrequestException.Errors;
+        customResponse.Errors = badrequestException.Errors;
         return StatusCodes.Status400BadRequest;
     }
 
     private static async Task HandleNotFoundEndPointAsync(HttpContext context)
     {
-        // handel not found endpoint
         if (context.Response.StatusCode == StatusCodes.Status404NotFound)
         {
             var response = new CustomError()
@@ -59,7 +60,7 @@ public class CustomExceptionHandlerMiddleware(RequestDelegate Next, ILogger<Cust
                 StatusCode = StatusCodes.Status404NotFound,
                 Message = $"endpoint {context.Request.Path} is not found"
             };
-            await context.Response.WriteAsJsonAsync(response);
+            await context.Response.WriteAsJsonAsync(response, JsonOptions);
         }
     }
 }

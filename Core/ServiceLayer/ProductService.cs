@@ -19,11 +19,9 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
         var products = await repo.GetAllAsync(specs);
 
         var Data = _mapper.Map<IEnumerable<Product>, IEnumerable<ProductDto>>(products);
-        var ProductsCount = Data.Count();
-
         var totalspecs = new TotalRecordsSpecifications(queryParams);
         var TotalRecords = await repo.CountAsync(totalspecs);
-        return new PaginatedResult<ProductDto>(queryParams.PageIndex, ProductsCount, TotalRecords, Data);
+        return new PaginatedResult<ProductDto>(queryParams.PageIndex, queryParams.PageSize, TotalRecords, Data);
     }
 
     public async Task<ProductDto> GetProductByIdAsync(int id)
