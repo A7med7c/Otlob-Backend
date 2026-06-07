@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 ﻿using DomainLayer.Contracts;
 using E_Commerce.Web.CustomMiddleWares;
+=======
+﻿using System.Text.Json;
+using DomainLayer.Contracts;
+using E_Commerce.Web.CustomMiddleWares;
+using Swashbuckle.AspNetCore.SwaggerUI;
+>>>>>>> origin/Dev
 
 namespace E_Commerce.Web.Extentions;
 
@@ -22,7 +29,28 @@ public static class WebApplicationRegistration
     public static IApplicationBuilder UseSwaggerMiddlewares(this IApplicationBuilder app)
     {
         app.UseSwagger();
+<<<<<<< HEAD
         app.UseSwaggerUI();
+=======
+        app.UseSwaggerUI(Options =>
+{
+    Options.ConfigObject = new ConfigObject()
+    {
+        DisplayRequestDuration = true
+    };
+
+    Options.DocumentTitle = "Hatley";
+
+    Options.JsonSerializerOptions = new JsonSerializerOptions()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
+    Options.DocExpansion(DocExpansion.None);
+    Options.EnableFilter();
+    Options.EnablePersistAuthorization();
+});
+>>>>>>> origin/Dev
         return app;
     }
 }

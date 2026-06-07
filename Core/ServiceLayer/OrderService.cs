@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
 using DomainLayer.Exceptions;
+<<<<<<< HEAD
 using DomainLayer.Models;
+=======
+using DomainLayer.Models.BasketModule;
+>>>>>>> origin/Dev
 using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
 using ServiceImplementation.Specifications.OrderModule;
@@ -15,10 +19,26 @@ namespace ServiceImplementation
     {
         public async Task<ReturnedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
         {
+<<<<<<< HEAD
             var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.Address);
 
             var basket = await basketRepository.GetBasketById(orderDto.BasketId)
                 ?? throw new BasketNotFoundException(orderDto.BasketId);
+=======
+            var shipToAddress = orderDto.ShipToAddress ?? orderDto.Address
+                ?? throw new BadRequestException(["Shipping address is required."]);
+            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(shipToAddress);
+
+            var basket = await basketRepository.GetBasketById(orderDto.BasketId)
+                ?? throw new BasketNotFoundException(orderDto.BasketId);
+            ArgumentNullException.ThrowIfNull(basket.PaymentIntentId);
+
+            var orderRepo = unitOfWork.GetRepository<Order, Guid>();
+            var orderSepcs = new OrderWithPaymentIntentIdSpecifications(basket.PaymentIntentId);
+            var exsistingOrder = await orderRepo.GetByIdAsync(orderSepcs);
+
+            if (exsistingOrder is not null) orderRepo.Remove(exsistingOrder);
+>>>>>>> origin/Dev
 
             List<OrderItem> items = [];
 
@@ -37,10 +57,17 @@ namespace ServiceImplementation
 
             var subTotal = items.Sum(i => i.Quantity * i.Price);
 
+<<<<<<< HEAD
             var createdOrder = new Order(email, deliverymethod, orderAddress, items, subTotal);
 
 
             await unitOfWork.GetRepository<Order, Guid>().AddAsync(createdOrder);
+=======
+            var createdOrder = new Order(email, deliverymethod, orderAddress, items, subTotal, basket.PaymentIntentId);
+
+
+            await orderRepo.AddAsync(createdOrder);
+>>>>>>> origin/Dev
             await unitOfWork.SaveChangesAsync();
 
             return mapper.Map<Order, ReturnedOrderDto>(createdOrder);
