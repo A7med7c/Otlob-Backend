@@ -32,13 +32,14 @@ public static class InfrastructureServiceExtensions
             return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection"));
         });
 
-
-        services.AddIdentityCore<ApplicationUser>(options =>
+        // 
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.User.RequireUniqueEmail = true;
+            options.SignIn.RequireConfirmedEmail = true;
         })
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
+        .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
+        .AddDefaultTokenProviders();
         return services;
     }
 }

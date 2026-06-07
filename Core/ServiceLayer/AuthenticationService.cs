@@ -10,7 +10,9 @@ using Shared.DTOs.Email;
 using Shared.DTOs.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+
 
 namespace ServiceImplementation
 {
@@ -27,15 +29,58 @@ namespace ServiceImplementation
 
             if (!user.EmailConfirmed)
                 throw new UnAuthorizedException("Please verify your email first.");
-            return new UserDto()
+
+            var userDto = new UserDto()
             {
                 DisplayName = user.DisplayName,
                 Email = loginDto.Email,
                 UserName = user.UserName!,
                 Token = await CreateTokentAsync(user)
             };
+
+            if (user.RefreshTokens.Any(t => t.IsActive))
+            {
+                var activeRefreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+                userDto.RefreshToken = activeRefreshToken!.Token;
+                userDto.RefreshTokenExpiration = activeRefreshToken.ExpiresOn;
+            }
+            else
+            {
+                var refreshToken = GenerateRefreshToken();
+                userDto.RefreshToken = refreshToken.Token;
+                userDto.RefreshTokenExpiration = refreshToken.ExpiresOn;
+                user.RefreshTokens.Add(refreshToken);
+                await userManager.UpdateAsync(user);
+            }
+            return userDto;
         }
 
+        public async Task<UserDto> RefreshTokenAsync(string token)
+        {
+            var user = await userManager.Users
+                    .SingleOrDefaultAsync(u => u.RefreshTokens.Any(u => u.Token == token))
+                    ?? throw new UnAuthorizedException("Invalid Token"); ;
+            var refreshToken = user.RefreshTokens.SingleOrDefault(u => u.Token == token);
+            if (!refreshToken.IsActive)
+                throw new UnAuthorizedException("InActive Token");
+
+            refreshToken.RevokedOn = DateTime.UtcNow;
+            var newRefreshToken = GenerateRefreshToken();
+            user.RefreshTokens.Add(newRefreshToken);
+            await userManager.UpdateAsync(user);
+
+            var jwtToken = await CreateTokentAsync(user);
+
+            return new UserDto
+            {
+                Email = user.Email!,
+                DisplayName = user.DisplayName,
+                UserName = user.UserName!,
+                Token = jwtToken,
+                RefreshToken = newRefreshToken.Token,
+                RefreshTokenExpiration = newRefreshToken.ExpiresOn
+            };
+        }
         public async Task RegisterAsync(RegisterDto registerDto)
         {
             var user = new ApplicationUser()
@@ -168,6 +213,21 @@ namespace ServiceImplementation
             return mapper.Map<AddressDto>(user.Address);
         }
 
+        public async Task<bool> LogoutAsync(string token)
+        {
+            var user = await userManager.Users
+                   .SingleOrDefaultAsync(u => u.RefreshTokens.Any(u => u.Token == token))
+                   ?? throw new UnAuthorizedException("Invalid Token"); ;
+
+            var refreshToken = user.RefreshTokens.SingleOrDefault(u => u.Token == token);
+            if (!refreshToken.IsActive)
+                throw new UnAuthorizedException("InActive Token");
+
+            refreshToken.RevokedOn = DateTime.UtcNow;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
         private async Task<string> CreateTokentAsync(ApplicationUser user)
         {
             var userClaims = new List<Claim>()
@@ -190,10 +250,22 @@ namespace ServiceImplementation
                 issuer: configuration.GetSection("JWTOptions")["Issuer"],
                 audience: configuration.GetSection("JWTOptions")["Audience"],
                 claims: userClaims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: userCredentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(32);
+
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(randomBytes),
+                CreatedOn = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddDays(10)
+            };
         }
     }
 }
