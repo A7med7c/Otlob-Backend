@@ -2,13 +2,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-<<<<<<< HEAD
-using System.Text;
-=======
 using Shared.CutomResponses;
 using System.Text;
 using System.Text.Json;
->>>>>>> origin/Dev
 
 namespace E_Commerce.Web.Extentions;
 
@@ -16,10 +12,6 @@ public static class ServicesExtensions
 {
     public static IServiceCollection AddSwaggerServices(this IServiceCollection services)
     {
-<<<<<<< HEAD
-        services.AddOpenApi();
-        services.AddSwaggerGen();
-=======
         services.AddSwaggerGen();
         //options =>
         //{
@@ -48,7 +40,6 @@ public static class ServicesExtensions
         //        }
         //    });
         //});
->>>>>>> origin/Dev
         return services;
     }
     public static IServiceCollection AddWebApplicationServices(this IServiceCollection services)
@@ -77,9 +68,6 @@ public static class ServicesExtensions
                 ValidateAudience = true,
                 ValidAudience = configuration["JWTOptions:Audience"],
                 ValidateLifetime = true,
-<<<<<<< HEAD
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTOptions:Key"]))
-=======
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWTOptions:Key"]!)),
                 ClockSkew = TimeSpan.Zero
@@ -102,7 +90,6 @@ public static class ServicesExtensions
                         response,
                         new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
                 }
->>>>>>> origin/Dev
             };
         });
         return services;

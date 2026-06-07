@@ -7,13 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-<<<<<<< HEAD
-=======
     <PackageReference Include="Twilio" Version="7.14.9" />
   </ItemGroup>
 
   <ItemGroup>
->>>>>>> origin/Dev
     <ProjectReference Include="..\..\Shared\Shared.csproj" />
   </ItemGroup>
 

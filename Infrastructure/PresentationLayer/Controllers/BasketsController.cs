@@ -5,11 +5,6 @@ using Shared.DTOs.Basket;
 namespace PresentationLayer.Controllers;
 
 [ApiController]
-<<<<<<< HEAD
-[Route("api/[Controller]")]
-public class BasketsController(IServicesManager servicesManager) : ControllerBase
-{
-=======
 [Route("api/baskets")]
 public class BasketsController(IServicesManager servicesManager) : ControllerBase
 {
@@ -20,7 +15,6 @@ public class BasketsController(IServicesManager servicesManager) : ControllerBas
         return Ok(basket);
     }
 
->>>>>>> origin/Dev
     [HttpGet("{key}")]
     public async Task<ActionResult<CustomerBasketDto>> GetBasket(string key)
     {
@@ -34,13 +28,6 @@ public class BasketsController(IServicesManager servicesManager) : ControllerBas
         var basket = await servicesManager.BasketService.CreateorUpdateBasketAsync(dto);
         return Ok(basket);
     }
-<<<<<<< HEAD
-    [HttpDelete("{key}")]
-    public async Task<ActionResult<bool>> DeleteBasket(string key)
-    {
-        var result = await servicesManager.BasketService.DeleteBasketAsync(key);
-        return Ok(result);
-=======
 
     [HttpDelete]
     public async Task<IActionResult> DeleteBasketByQuery([FromQuery] string id)
@@ -54,6 +41,5 @@ public class BasketsController(IServicesManager servicesManager) : ControllerBas
     {
         await servicesManager.BasketService.DeleteBasketAsync(key);
         return NoContent();
->>>>>>> origin/Dev
     }
 }

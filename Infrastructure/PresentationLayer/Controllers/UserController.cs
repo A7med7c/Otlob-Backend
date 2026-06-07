@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-<<<<<<< HEAD
-=======
 using Microsoft.AspNetCore.Http;
->>>>>>> origin/Dev
 using Microsoft.AspNetCore.Mvc;
 using SeviceAbstraction;
 using Shared.DTOs.Identity;
@@ -10,14 +7,6 @@ using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
-<<<<<<< HEAD
-    public class UserController(IServicesManager servicesManager) : ApiBaseController
-    {
-        [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
-        {
-            var userDto = await servicesManager.AuthenticationService.LoginAsync(loginDto);
-=======
     [Route("api/auth")]
     public class UserController(IServicesManager servicesManager) : ApiBaseController
     {
@@ -27,21 +16,10 @@ namespace PresentationLayer.Controllers
             var userDto = await servicesManager.AuthenticationService.LoginAsync(loginDto);
             if (!string.IsNullOrEmpty(userDto.RefreshToken))
                 SetRefreshTokenInCookie(userDto.RefreshToken, userDto.RefreshTokenExpiration);
->>>>>>> origin/Dev
             return Ok(userDto);
         }
 
         [HttpPost("register")]
-<<<<<<< HEAD
-        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
-        {
-            var userDto = await servicesManager.AuthenticationService.RegisterAsync(registerDto);
-            return Ok(userDto);
-        }
-
-        [HttpGet("CheckEmail")]
-        public async Task<ActionResult<bool>> CheckEmail(string email)
-=======
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             await servicesManager.AuthenticationService.RegisterAsync(registerDto);
@@ -82,7 +60,6 @@ namespace PresentationLayer.Controllers
 
         [HttpGet("email-exists")]
         public async Task<ActionResult<bool>> CheckEmail([FromQuery] string email)
->>>>>>> origin/Dev
         {
             var isExisted = await servicesManager.AuthenticationService.CheckEmailAsync(email);
             return Ok(isExisted);
@@ -108,18 +85,12 @@ namespace PresentationLayer.Controllers
 
         [Authorize]
         [HttpPut("address")]
-<<<<<<< HEAD
-        public async Task<ActionResult<AddressDto>> UpdateCurrentUserAddress(AddressDto dto)
-=======
         public async Task<ActionResult<AddressDto>> UpdateCurrentUserAddress([FromBody] AddressDto dto)
->>>>>>> origin/Dev
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
             var userAddress = await servicesManager.AuthenticationService.UpdateCurrentUserAddressAsync(email!, dto);
             return Ok(userAddress);
         }
-<<<<<<< HEAD
-=======
 
         [Authorize]
         [HttpPost("logout")]
@@ -145,6 +116,5 @@ namespace PresentationLayer.Controllers
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
->>>>>>> origin/Dev
     }
 }

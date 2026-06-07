@@ -1,8 +1,4 @@
 ﻿using AutoMapper;
-<<<<<<< HEAD
-using DomainLayer.Models;
-=======
->>>>>>> origin/Dev
 using DomainLayer.Models.BasketModule;
 using Shared.DTOs.Basket;
 

@@ -184,8 +184,6 @@ namespace Persistence.Identity.Migrations
                     b.Navigation("User");
                 });
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("DomainLayer.Models.IdetityModule.ApplicationUser", b =>
                 {
                     b.OwnsMany("DomainLayer.Models.IdetityModule.RefreshToken", "RefreshTokens", b1 =>
@@ -223,7 +221,6 @@ namespace Persistence.Identity.Migrations
                     b.Navigation("RefreshTokens");
                 });
 
->>>>>>> origin/Dev
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)

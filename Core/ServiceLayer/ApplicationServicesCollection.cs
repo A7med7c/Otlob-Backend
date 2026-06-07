@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-﻿using Microsoft.Extensions.DependencyInjection;
-=======
 ﻿using DomainLayer.Models.SettingsModule;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
->>>>>>> origin/Dev
 using ServiceImplementation.MappingProfiles;
 using SeviceAbstraction;
 
@@ -12,11 +8,6 @@ namespace ServiceImplementation;
 
 public static class ApplicationServiceExtensions
 {
-<<<<<<< HEAD
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
-    {
-        services.AddScoped<IServicesManager, ServicesManager>();
-=======
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IServicesManager, ServiceManagerWithFactoryDelegate>();
@@ -48,7 +39,6 @@ public static class ApplicationServiceExtensions
 
         services.AddTransient<INotificationsService, NotificationsService>();
 
->>>>>>> origin/Dev
 
         services.AddAutoMapper(cfg =>
         {
@@ -57,10 +47,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ImageResolver>();
         services.AddScoped<OrderItemPictureUrlResolver>();
 
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/Dev
         return services;
     }
 }

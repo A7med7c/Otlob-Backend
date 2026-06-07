@@ -1,11 +1,8 @@
 using E_Commerce.Web.Extentions;
 using Persistence;
 using ServiceImplementation;
-<<<<<<< HEAD
-=======
 using System.Text.Json;
 using System.Text.Json.Serialization;
->>>>>>> origin/Dev
 
 namespace E_Commerce.Web
 {
@@ -16,13 +13,6 @@ namespace E_Commerce.Web
             var builder = WebApplication.CreateBuilder(args);
 
             #region Add services to the container
-<<<<<<< HEAD
-
-            builder.Services.AddControllers();
-            builder.Services.AddSwaggerServices();
-            builder.Services.AddWebApplicationServices();
-            builder.Services.AddApplicationServices();
-=======
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", builder =>
@@ -41,7 +31,6 @@ namespace E_Commerce.Web
             builder.Services.AddSwaggerServices();
             builder.Services.AddWebApplicationServices();
             builder.Services.AddApplicationServices(builder.Configuration);
->>>>>>> origin/Dev
             builder.Services.AddInfrastuctureServices(builder.Configuration);
             builder.Services.AddJWTServices(builder.Configuration);
             #endregion
@@ -61,10 +50,7 @@ namespace E_Commerce.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
-<<<<<<< HEAD
-=======
             app.UseCors("AllowAll");
->>>>>>> origin/Dev
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

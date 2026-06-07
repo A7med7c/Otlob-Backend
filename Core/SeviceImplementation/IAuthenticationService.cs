@@ -4,16 +4,6 @@ namespace SeviceAbstraction;
 
 public interface IAuthenticationService
 {
-<<<<<<< HEAD
-    Task<UserDto> RegisterAsync(RegisterDto registerDto);
-    Task<UserDto> LoginAsync(LoginDto loginDto);
-    Task<bool> CheckEmailAsync(string email);
-
-    Task<UserDto> GetCurrentUserAsync(string email);
-    Task<AddressDto> GetCurrentUserAddressAsync(string email);
-    Task<AddressDto> UpdateCurrentUserAddressAsync(string email, AddressDto addressDto);
-
-=======
     Task RegisterAsync(RegisterDto registerDto);
     Task<string> ConfirmEmailAsync(string email, string token);
     Task ResendConfirmationEmailAsync(string email);
@@ -24,5 +14,4 @@ public interface IAuthenticationService
     Task<UserDto> GetCurrentUserAsync(string email);
     Task<AddressDto> GetCurrentUserAddressAsync(string email);
     Task<AddressDto> UpdateCurrentUserAddressAsync(string email, AddressDto addressDto);
->>>>>>> origin/Dev
 }

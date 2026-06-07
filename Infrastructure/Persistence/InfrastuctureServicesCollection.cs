@@ -23,11 +23,8 @@ public static class InfrastructureServiceExtensions
         // rgister Seeder Service
         services.AddScoped<IDataSeeder, DataSeeder>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-<<<<<<< HEAD
-=======
         services.AddScoped<ICashRepository, CashRepository>();
 
->>>>>>> origin/Dev
 
         services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddSingleton<IConnectionMultiplexer>((_) =>
@@ -35,15 +32,6 @@ public static class InfrastructureServiceExtensions
             return ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection"));
         });
 
-<<<<<<< HEAD
-
-        services.AddIdentityCore<ApplicationUser>(options =>
-        {
-            options.User.RequireUniqueEmail = true;
-        })
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
-=======
         // 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
@@ -52,7 +40,6 @@ public static class InfrastructureServiceExtensions
         })
         .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
         .AddDefaultTokenProviders();
->>>>>>> origin/Dev
         return services;
     }
 }

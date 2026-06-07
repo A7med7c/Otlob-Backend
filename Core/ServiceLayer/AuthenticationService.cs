@@ -6,16 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SeviceAbstraction;
-<<<<<<< HEAD
-using Shared.DTOs.Identity;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-
-namespace ServiceImplementation
-{
-    public class AuthenticationService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IMapper mapper) : IAuthenticationService
-=======
 using Shared.DTOs.Email;
 using Shared.DTOs.Identity;
 using System.IdentityModel.Tokens.Jwt;
@@ -28,7 +18,6 @@ namespace ServiceImplementation
 {
     public class AuthenticationService(UserManager<ApplicationUser> userManager,
         IConfiguration configuration, IMapper mapper, INotificationsService notificationsService) : IAuthenticationService
->>>>>>> origin/Dev
     {
 
         public async Task<UserDto> LoginAsync(LoginDto loginDto)
@@ -36,19 +25,6 @@ namespace ServiceImplementation
             var user = await userManager.FindByEmailAsync(loginDto.Email) ?? throw new UserNotFoundException(loginDto.Email);
 
             if (!await userManager.CheckPasswordAsync(user, loginDto.Password))
-<<<<<<< HEAD
-                throw new UnAuthorizedException();
-
-            return new UserDto()
-            {
-                DisplayName = user.DisplayName,
-                Email = loginDto.Email,
-                Token = await CreateTokentAsync(user)
-            };
-        }
-
-        public async Task<UserDto> RegisterAsync(RegisterDto registerDto)
-=======
                 throw new UnAuthorizedException("Invalid Credentials");
 
             if (!user.EmailConfirmed)
@@ -106,18 +82,13 @@ namespace ServiceImplementation
             };
         }
         public async Task RegisterAsync(RegisterDto registerDto)
->>>>>>> origin/Dev
         {
             var user = new ApplicationUser()
             {
                 Email = registerDto.Email,
                 DisplayName = registerDto.DisplayName,
                 PhoneNumber = registerDto.Phone,
-<<<<<<< HEAD
-                UserName = registerDto.UserName
-=======
                 UserName = string.IsNullOrWhiteSpace(registerDto.UserName) ? registerDto.Email : registerDto.UserName
->>>>>>> origin/Dev
             };
 
             var result = await userManager.CreateAsync(user, registerDto.Password);
@@ -127,15 +98,6 @@ namespace ServiceImplementation
 
                 throw new BadRequestException(errors);
             }
-<<<<<<< HEAD
-            return new UserDto()
-            {
-                DisplayName = user.DisplayName,
-                Email = user.Email,
-                Token = await CreateTokentAsync(user)
-            };
-
-=======
 
             await SendEmailConfirmationAsync(user);
         }
@@ -205,7 +167,6 @@ namespace ServiceImplementation
                 throw new BadRequestException(errors);
             }
             return "Email confirmed successfully";
->>>>>>> origin/Dev
         }
 
         public async Task<bool> CheckEmailAsync(string email)
@@ -217,11 +178,7 @@ namespace ServiceImplementation
         public async Task<UserDto> GetCurrentUserAsync(string email)
         {
             var user = await userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
-<<<<<<< HEAD
-            return new UserDto() { Email = email, DisplayName = user.DisplayName, Token = await CreateTokentAsync(user) };
-=======
             return new UserDto() { Email = email, DisplayName = user.DisplayName, UserName = user.UserName!, Token = await CreateTokentAsync(user) };
->>>>>>> origin/Dev
         }
 
         public async Task<AddressDto> GetCurrentUserAddressAsync(string email)
@@ -255,8 +212,6 @@ namespace ServiceImplementation
 
             return mapper.Map<AddressDto>(user.Address);
         }
-<<<<<<< HEAD
-=======
 
         public async Task<bool> LogoutAsync(string token)
         {
@@ -273,7 +228,6 @@ namespace ServiceImplementation
             return true;
         }
 
->>>>>>> origin/Dev
         private async Task<string> CreateTokentAsync(ApplicationUser user)
         {
             var userClaims = new List<Claim>()
@@ -296,17 +250,11 @@ namespace ServiceImplementation
                 issuer: configuration.GetSection("JWTOptions")["Issuer"],
                 audience: configuration.GetSection("JWTOptions")["Audience"],
                 claims: userClaims,
-<<<<<<< HEAD
-                expires: DateTime.Now.AddHours(1),
-=======
                 expires: DateTime.UtcNow.AddMinutes(15),
->>>>>>> origin/Dev
                 signingCredentials: userCredentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-<<<<<<< HEAD
-=======
 
         private RefreshToken GenerateRefreshToken()
         {
@@ -319,6 +267,5 @@ namespace ServiceImplementation
                 ExpiresOn = DateTime.UtcNow.AddDays(10)
             };
         }
->>>>>>> origin/Dev
     }
 }

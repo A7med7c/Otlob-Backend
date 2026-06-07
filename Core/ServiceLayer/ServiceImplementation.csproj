@@ -8,17 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.1.1" />
-<<<<<<< HEAD
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
-=======
     <PackageReference Include="MailKit" Version="4.17.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
     <PackageReference Include="MimeKit" Version="4.17.0" />
     <PackageReference Include="Stripe.net" Version="51.3.0-beta.1" />
     <PackageReference Include="Twilio" Version="7.14.9" />
->>>>>>> origin/Dev
   </ItemGroup>
 
   <ItemGroup>

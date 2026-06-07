@@ -1,22 +1,9 @@
-<<<<<<< HEAD
-﻿namespace Shared;
-=======
 namespace Shared;
->>>>>>> origin/Dev
 
 public class ProductQueryParams
 {
     private const int DefaultPageSize = 5;
     private const int MaxPageSize = 10;
-<<<<<<< HEAD
-    public int? BrandId { get; set; }
-    public int? TypeId { get; set; }
-    public string? SearchPhrase { get; set; }
-    public ProductSortingOptions sortingOptions { get; set; }
-
-    public int PageIndex { get; set; }
-    private int pageSize;
-=======
 
     public int? BrandId { get; set; }
     public int? TypeId { get; set; }
@@ -38,17 +25,10 @@ public class ProductQueryParams
             _ => ProductSortingOptions.NameAsc
         };
     }
->>>>>>> origin/Dev
 
     public int PageSize
     {
         get { return pageSize; }
-<<<<<<< HEAD
-        set { pageSize = value > MaxPageSize ? DefaultPageSize : value; }
-    }
-
-=======
         set { pageSize = value <= 0 || value > MaxPageSize ? DefaultPageSize : value; }
     }
->>>>>>> origin/Dev
 }

@@ -6,8 +6,5 @@ public interface IServicesManager
     public IBasketService BasketService { get; }
     public IAuthenticationService AuthenticationService { get; }
     public IOrderService OrderService { get; }
-<<<<<<< HEAD
-=======
     public IPaymentService PaymentService { get; }
->>>>>>> origin/Dev
 }
