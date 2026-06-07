@@ -6,4 +6,5 @@ public class ApplicationUser : IdentityUser
 {
     public string DisplayName { get; set; } = default!;
     public Address? Address { get; set; }
+    public List<RefreshToken>? RefreshTokens { get; set; }
 }

@@ -6,13 +6,14 @@ public class Order : BaseEntity<Guid>
     {
 
     }
-    public Order(string userEmail, DeliveryMethod deliveyMethod, ShippingAddress shippingAddress, ICollection<OrderItem> items, decimal subTotal)
+    public Order(string userEmail, DeliveryMethod deliveyMethod, ShippingAddress shippingAddress, ICollection<OrderItem> items, decimal subTotal, string paymentIntentId)
     {
         UserEmail = userEmail;
         DeliveyMethod = deliveyMethod;
         ShippingAddress = shippingAddress;
         Items = items;
         SubTotal = subTotal;
+        PaymentIntentId = paymentIntentId;
     }
 
     public string UserEmail { get; set; } = default!;
@@ -25,4 +26,5 @@ public class Order : BaseEntity<Guid>
     public int DeliveryMethodId { get; set; }
     public OrderStatus OrderStatus { get; set; }
     public decimal GetTotal => SubTotal + DeliveyMethod.Price;
+    public string PaymentIntentId { get; set; }
 }

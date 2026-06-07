@@ -8,12 +8,12 @@ internal class ProductWithTypesandBrandsSpecifications : BaseSpecifications<Prod
     public ProductWithTypesandBrandsSpecifications(ProductQueryParams queryParams) :
         base(p => (!queryParams.BrandId.HasValue || p.BrandId == queryParams.BrandId)
         && (!queryParams.TypeId.HasValue || p.TypeId == queryParams.TypeId)
-        && (string.IsNullOrWhiteSpace(queryParams.SearchPhrase) || p.Name.ToLower().Contains(queryParams.SearchPhrase) || p.Description.ToLower().Contains(queryParams.SearchPhrase)))
+        && (string.IsNullOrWhiteSpace(queryParams.Search) || p.Name.ToLower().Contains(queryParams.Search.ToLower()) || p.Description.ToLower().Contains(queryParams.Search.ToLower())))
     {
         AddIncludes(p => p.ProductType);
         AddIncludes(p => p.ProductBrand);
 
-        switch (queryParams.sortingOptions)
+        switch (queryParams.SortingOptions)
         {
             case ProductSortingOptions.NameAsc:
                 AddOrderBy(p => p.Name);

@@ -1,8 +1,11 @@
-﻿namespace Shared.DTOs.Basket;
+namespace Shared.DTOs.Basket;
 
 public class CustomerBasketDto
 {
     public string Id { get; set; } = default!;
-
     public ICollection<BasketItemsDto> Items { get; set; } = [];
+    public string? ClientSecret { get; set; }
+    public string? PaymentIntentId { get; set; }
+    public int? DeliveryMethodId { get; set; }
+    public decimal? ShippingPrice { get; set; }
 }

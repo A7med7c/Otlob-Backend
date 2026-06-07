@@ -5,9 +5,10 @@ using Shared.DTOs.Order;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
+    [Route("api/orders")]
     public class OrdersController(IServicesManager servicesManager) : ApiBaseController
     {
-        [Authorize]
         [HttpPost]
         public async Task<ActionResult<ReturnedOrderDto>> CreateOrder(OrderDto dto)
         {
@@ -15,7 +16,6 @@ namespace PresentationLayer.Controllers
             return Ok(order);
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReturnedOrderDto>>> GetUserOrders()
         {
@@ -30,7 +30,8 @@ namespace PresentationLayer.Controllers
             return Ok(order);
         }
 
-        [HttpGet("DeliveryMethods")]
+        [AllowAnonymous]
+        [HttpGet("deliveryMethods")]
         public async Task<ActionResult<IEnumerable<DeliveryMethodDto>>> GetDeliveryMethods()
         {
             var deliveryMethods = await servicesManager.OrderService.GetDeliveryMethodsAsync();

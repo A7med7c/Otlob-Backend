@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DomainLayer.Contracts;
 using DomainLayer.Exceptions;
-using DomainLayer.Models;
+using DomainLayer.Models.BasketModule;
 using DomainLayer.Models.OrderModule;
 using DomainLayer.Models.Product;
 using ServiceImplementation.Specifications.OrderModule;
@@ -15,10 +15,19 @@ namespace ServiceImplementation
     {
         public async Task<ReturnedOrderDto> CreateOrderAsync(string email, OrderDto orderDto)
         {
-            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(orderDto.Address);
+            var shipToAddress = orderDto.ShipToAddress ?? orderDto.Address
+                ?? throw new BadRequestException(["Shipping address is required."]);
+            var orderAddress = mapper.Map<AddressDto, ShippingAddress>(shipToAddress);
 
             var basket = await basketRepository.GetBasketById(orderDto.BasketId)
                 ?? throw new BasketNotFoundException(orderDto.BasketId);
+            ArgumentNullException.ThrowIfNull(basket.PaymentIntentId);
+
+            var orderRepo = unitOfWork.GetRepository<Order, Guid>();
+            var orderSepcs = new OrderWithPaymentIntentIdSpecifications(basket.PaymentIntentId);
+            var exsistingOrder = await orderRepo.GetByIdAsync(orderSepcs);
+
+            if (exsistingOrder is not null) orderRepo.Remove(exsistingOrder);
 
             List<OrderItem> items = [];
 
@@ -37,10 +46,10 @@ namespace ServiceImplementation
 
             var subTotal = items.Sum(i => i.Quantity * i.Price);
 
-            var createdOrder = new Order(email, deliverymethod, orderAddress, items, subTotal);
+            var createdOrder = new Order(email, deliverymethod, orderAddress, items, subTotal, basket.PaymentIntentId);
 
 
-            await unitOfWork.GetRepository<Order, Guid>().AddAsync(createdOrder);
+            await orderRepo.AddAsync(createdOrder);
             await unitOfWork.SaveChangesAsync();
 
             return mapper.Map<Order, ReturnedOrderDto>(createdOrder);

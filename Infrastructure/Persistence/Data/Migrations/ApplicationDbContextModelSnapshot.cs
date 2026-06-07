@@ -68,6 +68,10 @@ namespace Persistence.Data.Migrations
                     b.Property<int>("OrderStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("SubTotal")
                         .HasColumnType("decimal(8, 2)");
 

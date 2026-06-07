@@ -6,14 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SeviceAbstraction;
+using Shared.DTOs.Email;
 using Shared.DTOs.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+
 
 namespace ServiceImplementation
 {
-    public class AuthenticationService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IMapper mapper) : IAuthenticationService
+    public class AuthenticationService(UserManager<ApplicationUser> userManager,
+        IConfiguration configuration, IMapper mapper, INotificationsService notificationsService) : IAuthenticationService
     {
 
         public async Task<UserDto> LoginAsync(LoginDto loginDto)
@@ -21,24 +25,70 @@ namespace ServiceImplementation
             var user = await userManager.FindByEmailAsync(loginDto.Email) ?? throw new UserNotFoundException(loginDto.Email);
 
             if (!await userManager.CheckPasswordAsync(user, loginDto.Password))
-                throw new UnAuthorizedException();
+                throw new UnAuthorizedException("Invalid Credentials");
 
-            return new UserDto()
+            if (!user.EmailConfirmed)
+                throw new UnAuthorizedException("Please verify your email first.");
+
+            var userDto = new UserDto()
             {
                 DisplayName = user.DisplayName,
                 Email = loginDto.Email,
+                UserName = user.UserName!,
                 Token = await CreateTokentAsync(user)
             };
+
+            if (user.RefreshTokens.Any(t => t.IsActive))
+            {
+                var activeRefreshToken = user.RefreshTokens.FirstOrDefault(t => t.IsActive);
+                userDto.RefreshToken = activeRefreshToken!.Token;
+                userDto.RefreshTokenExpiration = activeRefreshToken.ExpiresOn;
+            }
+            else
+            {
+                var refreshToken = GenerateRefreshToken();
+                userDto.RefreshToken = refreshToken.Token;
+                userDto.RefreshTokenExpiration = refreshToken.ExpiresOn;
+                user.RefreshTokens.Add(refreshToken);
+                await userManager.UpdateAsync(user);
+            }
+            return userDto;
         }
 
-        public async Task<UserDto> RegisterAsync(RegisterDto registerDto)
+        public async Task<UserDto> RefreshTokenAsync(string token)
+        {
+            var user = await userManager.Users
+                    .SingleOrDefaultAsync(u => u.RefreshTokens.Any(u => u.Token == token))
+                    ?? throw new UnAuthorizedException("Invalid Token"); ;
+            var refreshToken = user.RefreshTokens.SingleOrDefault(u => u.Token == token);
+            if (!refreshToken.IsActive)
+                throw new UnAuthorizedException("InActive Token");
+
+            refreshToken.RevokedOn = DateTime.UtcNow;
+            var newRefreshToken = GenerateRefreshToken();
+            user.RefreshTokens.Add(newRefreshToken);
+            await userManager.UpdateAsync(user);
+
+            var jwtToken = await CreateTokentAsync(user);
+
+            return new UserDto
+            {
+                Email = user.Email!,
+                DisplayName = user.DisplayName,
+                UserName = user.UserName!,
+                Token = jwtToken,
+                RefreshToken = newRefreshToken.Token,
+                RefreshTokenExpiration = newRefreshToken.ExpiresOn
+            };
+        }
+        public async Task RegisterAsync(RegisterDto registerDto)
         {
             var user = new ApplicationUser()
             {
                 Email = registerDto.Email,
                 DisplayName = registerDto.DisplayName,
                 PhoneNumber = registerDto.Phone,
-                UserName = registerDto.UserName
+                UserName = string.IsNullOrWhiteSpace(registerDto.UserName) ? registerDto.Email : registerDto.UserName
             };
 
             var result = await userManager.CreateAsync(user, registerDto.Password);
@@ -48,13 +98,75 @@ namespace ServiceImplementation
 
                 throw new BadRequestException(errors);
             }
-            return new UserDto()
-            {
-                DisplayName = user.DisplayName,
-                Email = user.Email,
-                Token = await CreateTokentAsync(user)
-            };
 
+            await SendEmailConfirmationAsync(user);
+        }
+
+        private async Task SendEmailConfirmationAsync(ApplicationUser user)
+        {
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(token);
+
+            var confirmationLink =
+                $"{configuration["Urls:BaseUrl"]}api/auth/confirm-email" +
+                $"?email={user.Email}" +
+                $"&token={encodedToken}";
+
+            var body = $@"
+        <div style='font-family:Arial'>
+            <h2>Welcome to Otlob</h2>
+
+            <p>
+                Please verify your email address
+                by clicking the button below.
+            </p>
+
+            <a href='{confirmationLink}'
+               style='background:#2563eb;
+                      color:white;
+                      padding:12px 20px;
+                      text-decoration:none;
+                      border-radius:6px'>
+                Verify Email
+            </a>
+
+            <p>
+                If you did not create this account,
+                ignore this email.
+            </p>
+        </div>";
+
+            await notificationsService.SendEmailAsync(new EmailRequestDto()
+            {
+                To = user.Email!,
+                Subject = "Verify Your Email",
+                Body = body
+            });
+        }
+
+        public async Task ResendConfirmationEmailAsync(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
+
+            if (user.EmailConfirmed) throw new BadRequestException(["Email Confirmed Already"]);
+
+            await SendEmailConfirmationAsync(user);
+        }
+
+        public async Task<string> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
+            if (user.EmailConfirmed) return "Email already confirmed";
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+
+                throw new BadRequestException(errors);
+            }
+            return "Email confirmed successfully";
         }
 
         public async Task<bool> CheckEmailAsync(string email)
@@ -66,7 +178,7 @@ namespace ServiceImplementation
         public async Task<UserDto> GetCurrentUserAsync(string email)
         {
             var user = await userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
-            return new UserDto() { Email = email, DisplayName = user.DisplayName, Token = await CreateTokentAsync(user) };
+            return new UserDto() { Email = email, DisplayName = user.DisplayName, UserName = user.UserName!, Token = await CreateTokentAsync(user) };
         }
 
         public async Task<AddressDto> GetCurrentUserAddressAsync(string email)
@@ -100,6 +212,22 @@ namespace ServiceImplementation
 
             return mapper.Map<AddressDto>(user.Address);
         }
+
+        public async Task<bool> LogoutAsync(string token)
+        {
+            var user = await userManager.Users
+                   .SingleOrDefaultAsync(u => u.RefreshTokens.Any(u => u.Token == token))
+                   ?? throw new UnAuthorizedException("Invalid Token"); ;
+
+            var refreshToken = user.RefreshTokens.SingleOrDefault(u => u.Token == token);
+            if (!refreshToken.IsActive)
+                throw new UnAuthorizedException("InActive Token");
+
+            refreshToken.RevokedOn = DateTime.UtcNow;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
         private async Task<string> CreateTokentAsync(ApplicationUser user)
         {
             var userClaims = new List<Claim>()
@@ -122,10 +250,22 @@ namespace ServiceImplementation
                 issuer: configuration.GetSection("JWTOptions")["Issuer"],
                 audience: configuration.GetSection("JWTOptions")["Audience"],
                 claims: userClaims,
-                expires: DateTime.Now.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: userCredentials
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private RefreshToken GenerateRefreshToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(32);
+
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(randomBytes),
+                CreatedOn = DateTime.UtcNow,
+                ExpiresOn = DateTime.UtcNow.AddDays(10)
+            };
         }
     }
 }
