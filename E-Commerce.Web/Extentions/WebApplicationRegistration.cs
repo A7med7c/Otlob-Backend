@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using DomainLayer.Contracts;
+﻿using DomainLayer.Contracts;
 using E_Commerce.Web.CustomMiddleWares;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text.Json;
 
 namespace E_Commerce.Web.Extentions;
 
@@ -31,7 +31,7 @@ public static class WebApplicationRegistration
         DisplayRequestDuration = true
     };
 
-    Options.DocumentTitle = "Hatley";
+    Options.DocumentTitle = "Otlob";
 
     Options.JsonSerializerOptions = new JsonSerializerOptions()
     {
