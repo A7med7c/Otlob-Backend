@@ -1,38 +1,104 @@
 # Otlob Backend API
 
-## Overview
+A production-oriented E-Commerce Backend built with ASP.NET Core Web API following Onion Architecture principles and modern software engineering practices.
 
-Otlob Backend API is a scalable e-commerce backend built using ASP.NET Core Web API and Onion Architecture principles. The project provides a complete backend solution for managing products, baskets, orders, payments, user authentication, notifications, caching, and file storage.
-
-The application follows clean separation of concerns using Repository Pattern, Unit of Work Pattern, Specification Pattern, and Dependency Injection to ensure maintainability, scalability, and testability.
+The project provides a complete backend solution for managing products, baskets, orders, payments, authentication, authorization, notifications, caching, and file storage. It demonstrates enterprise-level backend development concepts including clean architecture, domain-driven design principles, scalable application structure, and integration with external services.
 
 ---
 
-## Features
+## Table of Contents
+
+* Overview
+* Architecture
+* Key Features
+* Technology Stack
+* Design Patterns
+* Authentication Flow
+* Payment Flow
+* API Modules
+* Product Filtering & Pagination
+* Project Structure
+* Getting Started
+* Configuration
+* Database & Seeding
+* Future Improvements
+* Author
+
+---
+
+## Overview
+
+Otlob Backend API is designed to simulate a real-world e-commerce platform capable of handling authentication, product management, shopping baskets, order processing, payment workflows, notifications, and caching.
+
+The application emphasizes:
+
+* Clean separation of concerns
+* Maintainable and scalable architecture
+* Secure authentication and authorization
+* Performance optimization through Redis caching
+* Extensible business logic through specifications
+* Integration with third-party services
+
+---
+
+## Architecture
+
+The project follows Onion Architecture to ensure that business logic remains independent from infrastructure concerns.
+
+```text
+Client Applications
+(Angular, React, Mobile Apps, Postman)
+                │
+                ▼
+         ASP.NET Core API
+                │
+                ▼
+        Application Layer
+        Services & DTOs
+                │
+                ▼
+          Domain Layer
+   Entities & Business Rules
+                │
+                ▼
+      Infrastructure Layer
+Database, Redis, Identity,
+Stripe, Twilio, SMTP
+```
+
+### Architectural Goals
+
+* High Maintainability
+* Separation of Concerns
+* Testability
+* Scalability
+* Loose Coupling
+* Extensibility
+
+---
+
+## Key Features
 
 ### Authentication & Authorization
 
-* User Registration
-* User Login
+* ASP.NET Core Identity
 * JWT Authentication
-* Refresh Token Authentication
-* ASP.NET Core Identity Integration
+* Refresh Token Mechanism
 * Role-Based Authorization
 * Custom Authorization Attributes
 * Email Confirmation
-* Logout Functionality
-* Email Availability Validation
+* Secure Login & Registration
+* User Profile Management
 
 ### Product Management
 
 * Product CRUD Operations
-* Product Brand Management
-* Product Type Management
+* Product Brands
+* Product Types
 * Product Search
-* Product Filtering
-* Product Sorting
-* Pagination Support
-* Resource URL Resolution
+* Dynamic Filtering
+* Sorting
+* Pagination
 
 ### Basket Management
 
@@ -40,149 +106,60 @@ The application follows clean separation of concerns using Repository Pattern, U
 * Update Basket
 * Retrieve Basket
 * Delete Basket
-* Redis-Based Basket Storage
+* Redis Basket Storage
 
 ### Order Management
 
 * Create Orders
 * Retrieve User Orders
-* Retrieve Order Details
+* Order Details
 * Delivery Methods
-* Order Item Management
 
-### Payment Processing
+### Payments
 
-* Stripe Payment Integration
+* Stripe Payment Gateway Integration
 * Payment Intent Creation
-* Payment Webhooks
-* Payment Status Updates
+* Payment Confirmation
+* Webhook Processing
 
 ### Notifications
 
-* Email Notifications using Gmail SMTP
-* SMS Notifications using Twilio
-
-### File Storage
-
-* File Storage Service
-* Resource Management
+* Gmail SMTP Integration
+* Twilio SMS Integration
 
 ### Caching
 
 * Redis Distributed Cache
-* Basket Caching
-* Custom Caching Services
+* Basket Persistence
+* Performance Optimization
 
 ### Error Handling
 
-* Global Exception Handling Middleware
+* Global Exception Middleware
 * Custom Exceptions
-* Validation Error Responses
-* Unified API Response Structure
+* Unified API Responses
 
 ### Data Management
 
 * Database Seeding
 * Identity Seeding
-* Roles Seeding
+* Role Seeding
 
 ---
 
-## Architecture
-
-The project follows Onion Architecture to maintain a clear separation between business logic, application logic, infrastructure, and presentation layers.
-
-### Layers
-
-#### Domain Layer
-
-Contains:
-
-* Entities
-* Contracts
-* Domain Exceptions
-
-#### Application Layer
-
-Contains:
-
-* Service Contracts
-* Specifications
-* Business Logic
-
-#### Infrastructure Layer
-
-Contains:
-
-* Entity Framework Core
-* SQL Server Integration
-* ASP.NET Identity
-* Redis Integration
-* Stripe Integration
-* Twilio Integration
-* SMTP Services
-* Repositories
-* Unit Of Work
-
-#### Presentation Layer
-
-Contains:
-
-* API Controllers
-* Filters
-* Middleware
-* Dependency Injection Configuration
-
----
-
-## Design Patterns
-
-### Repository Pattern
-
-Provides abstraction over data access operations.
-
-### Generic Repository Pattern
-
-Reusable CRUD functionality across entities.
-
-### Unit Of Work Pattern
-
-Coordinates repositories and manages transactions.
-
-### Specification Pattern
-
-Used for:
-
-* Filtering
-* Searching
-* Sorting
-* Pagination
-* Navigation Property Includes
-
-### Dependency Injection
-
-Provides loose coupling and testability.
-
-### Onion Architecture
-
-Ensures separation of concerns and maintainable code structure.
-
----
-
-## Technologies
+## Technology Stack
 
 ### Backend
 
 * ASP.NET Core Web API (.NET 10)
 * Entity Framework Core
 * SQL Server
-* ASP.NET Core Identity
 
 ### Authentication
 
+* ASP.NET Core Identity
 * JWT Bearer Authentication
 * Refresh Tokens
-* Role-Based Authorization
 
 ### Caching
 
@@ -196,7 +173,7 @@ Ensures separation of concerns and maintainable code structure.
 ### Notifications
 
 * Gmail SMTP
-* Twilio SMS API
+* Twilio
 
 ### Object Mapping
 
@@ -208,78 +185,137 @@ Ensures separation of concerns and maintainable code structure.
 
 ---
 
-## API Endpoints
+## Design Patterns
 
-### Authentication
+### Onion Architecture
 
-| Method | Endpoint                      |
-| ------ | ----------------------------- |
-| POST   | /api/auth/register            |
-| POST   | /api/auth/login               |
-| POST   | /api/auth/refresh-token       |
-| POST   | /api/auth/logout              |
-| GET    | /api/auth                     |
-| GET    | /api/auth/email-exists        |
-| GET    | /api/auth/confirm-email       |
-| POST   | /api/auth/resend-confirmation |
+Ensures a clean separation between business logic and infrastructure concerns.
 
-### Address
+### Repository Pattern
 
-| Method | Endpoint          |
-| ------ | ----------------- |
-| GET    | /api/auth/address |
-| PUT    | /api/auth/address |
+Provides abstraction over data access operations.
 
-### Products
+### Generic Repository Pattern
 
-| Method | Endpoint             |
-| ------ | -------------------- |
-| GET    | /api/products        |
-| GET    | /api/products/{id}   |
-| POST   | /api/products        |
-| PUT    | /api/products/{id}   |
-| DELETE | /api/products/{id}   |
-| GET    | /api/products/brands |
-| GET    | /api/products/types  |
+Reduces duplication by implementing reusable CRUD operations.
 
-### Basket
+### Unit Of Work Pattern
 
-| Method | Endpoint           |
-| ------ | ------------------ |
-| GET    | /api/baskets       |
-| POST   | /api/baskets       |
-| DELETE | /api/baskets       |
-| GET    | /api/baskets/{key} |
-| DELETE | /api/baskets/{key} |
+Coordinates repository operations and transaction management.
 
-### Orders
+### Specification Pattern
 
-| Method | Endpoint                    |
-| ------ | --------------------------- |
-| POST   | /api/orders                 |
-| GET    | /api/orders                 |
-| GET    | /api/orders/{id}            |
-| GET    | /api/orders/deliveryMethods |
+Used to support:
 
-### Payments
+* Dynamic Filtering
+* Searching
+* Sorting
+* Pagination
+* Query Reusability
 
-| Method | Endpoint                 |
-| ------ | ------------------------ |
-| POST   | /api/payments/{basketId} |
-| POST   | /api/payments/webhook    |
+### Dependency Injection
 
-### Notifications
-
-| Method | Endpoint                      |
-| ------ | ----------------------------- |
-| POST   | /api/notifications/send-email |
-| POST   | /api/notifications/send-sms   |
+Provides loose coupling and improved testability.
 
 ---
 
-## Product Search, Filtering, Sorting and Pagination
+## Authentication Flow
 
-The project implements the Specification Pattern to support advanced querying capabilities.
+```text
+User Registration
+        │
+        ▼
+Email Confirmation
+        │
+        ▼
+User Login
+        │
+        ▼
+Generate JWT Token
+Generate Refresh Token
+        │
+        ▼
+Access Protected Resources
+        │
+        ▼
+Refresh Access Token When Expired
+```
+
+---
+
+## Payment Flow
+
+```text
+User Checkout
+       │
+       ▼
+Create Payment Intent
+       │
+       ▼
+Stripe
+       │
+       ▼
+Payment Confirmation
+       │
+       ▼
+Stripe Webhook
+       │
+       ▼
+Order Status Update
+       │
+       ▼
+Email Notification
+SMS Notification
+```
+
+---
+
+## API Modules
+
+### Authentication
+
+* User Registration
+* User Login
+* Refresh Token
+* Logout
+* Email Confirmation
+* User Profile
+
+### Products
+
+* Products
+* Product Brands
+* Product Types
+
+### Basket
+
+* Create Basket
+* Update Basket
+* Retrieve Basket
+* Delete Basket
+
+### Orders
+
+* Create Orders
+* Retrieve Orders
+* Retrieve Order Details
+* Delivery Methods
+
+### Payments
+
+* Create Payment Intent
+* Handle Stripe Webhooks
+
+### Notifications
+
+* Email Notifications
+* SMS Notifications
+
+---
+
+## Product Filtering & Pagination
+
+The project implements the Specification Pattern to provide flexible and reusable query logic.
 
 Example:
 
@@ -287,126 +323,147 @@ Example:
 GET /api/products?search=iphone&brandId=1&typeId=2&sort=priceDesc&pageIndex=1&pageSize=10
 ```
 
-Supported features:
+Supported Operations:
 
-* Search by product name
-* Filter by brand
-* Filter by type
-* Sort by price ascending
-* Sort by price descending
+* Search
+* Filtering
+* Sorting
 * Pagination
 
 ---
 
-## Database
+## Project Statistics
 
-### Main Context
-
-```csharp
-ApplicationDbContext
-```
-
-### Identity Context
-
-```csharp
-ApplicationIdentityDbContext
-```
-
-### Database Provider
-
-```text
-SQL Server
-```
-
-### Startup Initialization
-
-The application automatically:
-
-* Applies migrations
-* Seeds products
-* Seeds brands
-* Seeds product types
-* Seeds roles
-* Seeds identity data
-
----
-
-## Redis Usage
-
-Redis is used for:
-
-* Basket storage
-* Distributed caching
-* Performance optimization
-
----
-
-## Stripe Integration
-
-Implemented functionality includes:
-
-* Create Payment Intent
-* Update Payment Intent
-* Payment Confirmation
-* Webhook Handling
-* Order Payment Tracking
-
----
-
-## Notification Services
-
-### Email
-
-Implemented using Gmail SMTP.
-
-Use cases:
-
-* Email Confirmation
-* Business Notifications
-
-### SMS
-
-Implemented using Twilio.
-
-Use cases:
-
-* User Notifications
-* Order Updates
-
----
-
-## Swagger Documentation
-
-Swagger/OpenAPI documentation is available during development for testing and API exploration.
-
-```
-https://localhost:{port}/swagger
-```
-
----
-
-## Project Highlights
-
+* 30+ API Endpoints
 * Onion Architecture
-* ASP.NET Core Identity
-* JWT Authentication
-* Refresh Tokens
-* Role-Based Authorization
-* Custom Authorization Attributes
-* Repository Pattern
-* Generic Repository Pattern
-* Unit Of Work Pattern
+* ASP.NET Identity Integration
+* JWT & Refresh Tokens
+* Stripe Payment Integration
+* Redis Distributed Cache
+* SMTP Email Service
+* SMS Notifications
 * Specification Pattern
 * AutoMapper
-* Redis Caching
-* Stripe Payments
-* Twilio SMS Integration
-* Gmail SMTP Integration
-* Global Exception Middleware
-* Custom Exceptions
+* Global Exception Handling
 * Database Seeding
-* Swagger Documentation
-* File Storage Service
+
+---
+
+## Project Structure
+
+```text
+Otlob-Backend
+│
+├── Core
+│   ├── DomainLayer
+│   ├── ServiceLayer
+│   └── ServiceImplementation
+│
+├── Infrastructure
+│   ├── Persistence
+│   └── PresentationLayer
+│
+├── Shared
+│   ├── DTOs
+│   ├── Responses
+│   └── Common Models
+│
+├── E-Commerce.Web
+│   ├── Middleware
+│   ├── Configuration
+│   ├── Extensions
+│   └── Program.cs
+│
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+* .NET 10 SDK
+* SQL Server
+* Redis Server
+* Stripe Account
+* Twilio Account
+
+### Clone Repository
+
+```bash
+git clone https://github.com/A7med7c/Otlob-Backend.git
+cd Otlob-Backend
+```
+
+### Restore Dependencies
+
+```bash
+dotnet restore
+```
+
+### Apply Migrations
+
+```bash
+dotnet ef database update
+```
+
+### Run Application
+
+```bash
+dotnet run --project E-Commerce.Web
+```
+
+---
+
+## Configuration
+
+Configure the following settings through `appsettings.json`, environment variables, or user secrets.
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "",
+    "IdentityConnection": "",
+    "RedisConnection": ""
+  },
+
+  "JWTOptions": {
+    "Issuer": "",
+    "Audience": "",
+    "Key": ""
+  },
+
+  "Stripe": {
+    "SecretKey": "",
+    "PublishableKey": ""
+  },
+
+  "Twilio": {
+    "AccountSid": "",
+    "AuthToken": "",
+    "PhoneNumber": ""
+  },
+
+  "EmailSettings": {
+    "Email": "",
+    "Password": ""
+  }
+}
+```
+
+---
+
+## Database & Seeding
+
+The application automatically performs:
+
+* Database Migration
+* Product Seeding
+* Product Brand Seeding
+* Product Type Seeding
+* Identity Seeding
+* Roles Seeding
 
 ---
 
@@ -416,10 +473,10 @@ https://localhost:{port}/swagger
 * CI/CD Pipelines
 * Unit Testing
 * Integration Testing
-* Rate Limiting
-* Structured Logging with Serilog
+* Serilog Logging
 * OpenTelemetry Monitoring
-* Background Jobs using Hangfire
+* Rate Limiting
+* Background Jobs with Hangfire
 
 ---
 
@@ -427,6 +484,11 @@ https://localhost:{port}/swagger
 
 Ahmed Ragab
 
-Backend Developer
+Fullstach .NET & Angular Developer
 
-This project demonstrates enterprise-level backend development concepts including Onion Architecture, Specification Pattern, JWT Authentication, Refresh Tokens, Redis Caching, Stripe Payments, ASP.NET Identity, and scalable API design.
+GitHub:
+https://github.com/A7med7c
+
+---
+
+This project demonstrates enterprise-level backend development practices including Onion Architecture, Specification Pattern, JWT Authentication, Refresh Tokens, Redis Caching, Stripe Payments, ASP.NET Identity, and scalable API design.
