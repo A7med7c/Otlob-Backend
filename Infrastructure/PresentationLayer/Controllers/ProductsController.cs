@@ -25,6 +25,30 @@ public class ProductsController(IServicesManager _servicesManager) : ControllerB
         return Ok(product);
     }
 
+    [HttpPost]
+    public async Task<ActionResult<int>> CreateProduct([FromForm] CreateProductDto productDto)
+    {
+        var id = await _servicesManager.ProductService.CreateAsync(productDto);
+
+        return CreatedAtAction(nameof(GetProduct), new { id }, id);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromForm] UpdateProductDto dto)
+    {
+        await _servicesManager.ProductService.UpdateAsync(id, dto);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _servicesManager.ProductService.DeleteAsync(id);
+
+        return NoContent();
+    }
+
     [HttpGet("brands")]
     public async Task<ActionResult<IEnumerable<BrandDto>>> GetBrands()
     {

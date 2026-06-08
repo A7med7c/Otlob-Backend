@@ -6,10 +6,12 @@ using ServiceImplementation.Specifications;
 using SeviceAbstraction;
 using Shared;
 using Shared.DTOs.Product;
+using Shared.Enums;
 
 namespace ServiceImplementation;
 
-public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProductService
+public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper
+, IFileStorageService fileStorageService) : IProductService
 {
     public async Task<PaginatedResult<ProductDto>> GetAllProductsAsync(ProductQueryParams queryParams)
     {
@@ -33,6 +35,54 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
         var productDto = _mapper.Map<Product, ProductDto>(product);
         return productDto;
 
+    }
+    public async Task<int> CreateAsync(CreateProductDto dto)
+    {
+        var imageResult =
+            await fileStorageService.UploadAsync(dto.Image, UploadFolder.Products);
+
+        var product = _mapper.Map<Product>(dto);
+
+        product.PictureUrl = imageResult.Url;
+
+        await _unitOfWork.GetRepository<Product, int>().AddAsync(product);
+
+        return product.Id;
+    }
+
+    public async Task UpdateAsync(int id, UpdateProductDto dto)
+    {
+        var repo = _unitOfWork.GetRepository<Product, int>();
+
+        var product = await repo.GetByIdAsync(id)
+            ?? throw new ProductNotFoundException(id);
+
+        if (dto.Image is not null)
+        {
+            await fileStorageService.DeleteAsync(product.PictureUrl);
+
+            var imageResult = await fileStorageService.UploadAsync(dto.Image, UploadFolder.Products);
+
+            product.PictureUrl = imageResult.Url;
+        }
+
+        _mapper.Map(dto, product);
+
+        repo.Update(product);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var repo = _unitOfWork.GetRepository<Product, int>();
+
+        var product = await repo.GetByIdAsync(id)
+           ?? throw new ProductNotFoundException(id);
+
+        await fileStorageService.DeleteAsync(product.PictureUrl);
+
+        repo.Remove(product);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<BrandDto>> GetAllBrandsAsync()

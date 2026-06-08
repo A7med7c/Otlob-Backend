@@ -8,10 +8,11 @@ using SeviceAbstraction;
 namespace ServiceImplementation;
 
 public class ServicesManager(IUnitOfWork _unitOfWork, IMapper _mapper, IBasketRepository _basketRpository,
-    UserManager<ApplicationUser> _userManager, IConfiguration _configuration, INotificationsService notificationsService) : IServicesManager
+    UserManager<ApplicationUser> _userManager, IConfiguration _configuration,
+    INotificationsService notificationsService, IFileStorageService fileStorageService) : IServicesManager
 {
     private readonly Lazy<IProductService> _productService =
-        new Lazy<IProductService>(() => new ProductService(_unitOfWork, _mapper));
+        new Lazy<IProductService>(() => new ProductService(_unitOfWork, _mapper, fileStorageService));
     private readonly Lazy<IBasketService> _basketService =
         new Lazy<IBasketService>(() => new BasketService(_basketRpository, _mapper));
     private readonly Lazy<IAuthenticationService> _authService =

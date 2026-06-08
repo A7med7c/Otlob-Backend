@@ -38,7 +38,7 @@ public static class ApplicationServiceExtensions
         services.Configure<TwilioSettings>(configuration.GetSection("TwilioSettings"));
 
         services.AddTransient<INotificationsService, NotificationsService>();
-
+        services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
         services.AddAutoMapper(cfg =>
         {
